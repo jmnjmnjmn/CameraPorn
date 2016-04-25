@@ -1,0 +1,5 @@
+node_modules
+/client/bower_components
+/client/assets/images/uploads/*
+/server/config/environment/development.js
+
