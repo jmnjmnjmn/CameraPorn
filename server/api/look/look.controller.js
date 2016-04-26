@@ -162,6 +162,42 @@ exports.delete = function(req, res) {
   });
 };
 
+exports.addView = function(req, res) {
+  Look.findById(req.params.id, function(err, look) {
+    if(err) {
+      return handleError(res, err);
+    }
+    if (!look) {
+      return res.send(404);
+    }
+    look.views++;
+    look.save(function(err) {
+      if (err) {
+        return handle(res, err);
+      }
+      return res.json(look);
+    });
+  });
+};
+
+exports.addUpvote = function(req, res) {
+  Look.findById(req.params.id, function(err, look) {
+    if(err) {
+      return handleError(res, err);
+    }
+    if(!look) {
+      return res.send(404);
+    }
+    look.upVotes++;
+    look.save(function(err) {
+      if(err) {
+        return handleError(res, err);
+      }
+      return res.json(look);
+    });
+  });
+};
+
 function handleError(res, err) {
   return res.send(500, err);
 }
