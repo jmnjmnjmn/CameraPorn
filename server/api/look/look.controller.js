@@ -18,7 +18,7 @@ exports.allLooks = function(req, res) {
       if (!looks) {
         return res.send(404);
       }
-      console.log(looks);
+//      console.log(looks);
       return res.status(200)
                      .json(looks);
     });

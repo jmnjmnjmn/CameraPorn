@@ -24,18 +24,13 @@
             </div>
           </div>
 
-      <div class="spinner"
-             ng-show="loading">
-        <img src="assets/images/spinner.gif">
-      </div>
-
   <!-- Angular Grid -->
-  <div class="container">
+  <div class="container" infinite-scroll="nextPage()" infinite-scroll-disabled="busy || noMoreData" infinite-scroll-distance="0">
     <ul class="dynamic-grid angular-grid"
           angular-grid="looks"
           grid-width="275"
           gutter-size="10"
-          angular-grid-id="gallery"
+          angular-grid-id="gallery" 
           refresh-on-img-load="true">
      <li data-ng-repeat="look in looks track by $index"
           class="grid"
