@@ -3,27 +3,46 @@
 var _ = require('lodash');
 var Look = require('./look.model');
 var path = require('path');
+var express = require('express');
 var utils = require('../../utils/utils.js');
 
-//get every collections
 exports.allLooks = function(req, res) {
   Look.find({})
     .sort({
       createTime: -1
     })
     .exec(function(err, looks) {
-      if(err){
+      if (err) {
         return handleError(res, err);
       }
-      if(!looks) {
+      if (!looks) {
         return res.send(404);
       }
       console.log(looks);
-      //send back to front -end
       return res.status(200)
-        .json(looks);
-    })
-}
+                     .json(looks);
+    });
+};
+
+exports.userLooks = function(req, res) {
+  var userEmail = req.query.email;
+  Look.find({
+    email: {
+      $in: userEmail
+    }
+  })
+  .sort({
+    createTime: -1
+  })
+  .exec(function(err, looks) {
+    if(err) {
+      return handleError(res, err);
+    }
+    console.log(looks);
+    return res.status(200)
+                   .json(looks);
+  });
+};
 
 exports.scrapeUpload = function(req, res) {
   var random = utils.randomizer(32, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
@@ -33,6 +52,7 @@ exports.scrapeUpload = function(req, res) {
 
     var newLook = new Look();
     newLook.title = req.body.title;
+    newLook.image = filename.slice(9);
     newLook.email = req.body.email;
     newLook.linkURL = req.body.linkURL;
     newLook.description = req.body.description;
@@ -40,10 +60,9 @@ exports.scrapeUpload = function(req, res) {
     newLook._creator = req.body._creator;
     newLook.createTime = Date.now();
     newLook.upVotes = 0;
-    newLook.image = filename.slice(9);
     newLook.save(function(err, item) {
       if (err) {
-        console.log('error occured saving image');
+        console.log('error occured in saving post');
       } else {
         console.log('Success post saved');
         console.log(item);
@@ -70,15 +89,76 @@ exports.upload = function(req, res) {
   newLook.upVotes = 0;
 
   newLook.save(function(err, look) {
-    if (err) {
-      console.log('error saving look ');
+    if(err) {
+      console.log('error saving look');
       return res.send(500);
     } else {
       console.log(look);
-      console.log('Look Saved to DB ');
       res.status(200)
-        .send(look);
+           .send(look);
     }
+  });
+};
+
+exports.singleLook = function(req, res) {
+  Look.findById(req.params.lookId, function(err, look) {
+    if(err) {
+      return handleError(res, err);
+    }
+    if(!look) {
+      return res.send(404);
+    }
+    return res.json(look);
+  });
+};
+
+exports.update = function(req, res) {
+  if(req.body._id) {
+    delete req.body._id;
+  }
+  Look.findById(req.params.id, function(err, look) {
+    if(err) {
+      return handleError(res, err);
+      }
+      if(!look) {
+        return res.send(404);
+      }
+      var updated = _.merge(look, req.body);
+      updated.save(function(err) {
+        if(err) {
+          return handleError(res, err);
+        }
+        console.log(look);
+        return res.json(look);
+      });
+  });
+};
+exports.popLooks = function(req, res) {
+  Look.find(req.params.id)
+    .sort('-upVotes') // get max number
+    .limit(6)
+    .exec(function(err, looks) {
+      if (err) {
+        return handleError(res, err);
+      }
+      console.log(looks);
+      return res.json(looks);
+    });
+};
+exports.delete = function(req, res) {
+  Look.findById(req.params.id, function(err, look) {
+    if(err) {
+      return handleError(res, err);
+    }
+    if(!look) {
+      return res.send(404);
+    }
+    look.remove(function(err) {
+      if(err) {
+        return handleError(res, err);
+      }
+      return res.send(200);
+    });
   });
 };
 
