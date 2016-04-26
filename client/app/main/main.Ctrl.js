@@ -4,13 +4,15 @@
   angular
     .module('app')
     .controller('MainCtrl', MainCtrl);
-
+  
+    //alert is from AngularStrap
   MainCtrl.$inject = ['$scope', '$state', 'Auth', '$modal','looksAPI', 'scrapeAPI','$http','$alert'];
 
   function MainCtrl($scope, $state, Auth,  $modal, looksAPI, scrapeAPI,$http,$alert) {
     $scope.user = Auth.getCurrentUser();
 
     $scope.look = {};
+    $scope.looks = [];
     $scope.scrapePostForm = true;
 //    $scope.uploadLookTitle = true;
 //    $scope.uploadLookForm = false;
@@ -45,12 +47,22 @@
     $scope.showModal = function() {
       myModal.$promise.then(myModal.show);
     }
+    
+    looksAPI.getAllLooks()
+        .then(function(data) {
+          console.log(data);
+          $scope.looks = data.data;
+        })
+        .catch(function(err) {
+          console.log('failed to get loks' + err);
+        });    
 
     // Watch for changes to URL, Scrape and Display Results
     $scope.$watch('look.link', function(newVal, oldVal) {
       console.log(newVal);
-        if(newVal.length > 5) {
+      if(newVal.length > 5) {
         $scope.loading = true;
+      
       var link = {
         url: $scope.look.link                
       }
@@ -93,6 +105,7 @@
           $scope.gotScrapeResults = false;
           $scope.look.title = '';
           $scope.look.link = '';
+          $scope.looks.splice(0,0,data.data);//push into the view add to the first index
           console.log(data);
         })
         .catch(function() {
