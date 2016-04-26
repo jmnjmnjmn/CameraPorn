@@ -5,9 +5,9 @@
     .module('app')
     .controller('MainCtrl', MainCtrl);
 
-  MainCtrl.$inject = ['$scope', '$state', 'Auth', '$modal', '$http'];
+  MainCtrl.$inject = ['$scope', '$state', 'Auth', '$modal','looksAPI', 'scrapeAPI','$http','$alert'];
 
-  function MainCtrl($scope, $state, Auth, $modal, $http) {
+  function MainCtrl($scope, $state, Auth,  $modal, looksAPI, scrapeAPI,$http,$alert) {
     $scope.user = Auth.getCurrentUser();
 
     $scope.look = {};
@@ -18,6 +18,25 @@
     $scope.gotScrapeResults = false;
     $scope.loading = false;
 
+      
+    var alertSuccess = $alert({
+        title: 'Success! ',
+        content: 'New Look added',
+        placement: 'top-right',
+        container: '#alertContainer',
+        type: 'success',
+        duration: 8
+    });
+
+    var alertFail = $alert({
+        title: 'Not saved ',
+        content: 'New Look failed to save',
+        placement: 'top-right',
+        container: '#alertContainer',
+        type: 'warning',
+        duration: 8
+    });
+      
     var myModal = $modal({
       scope: $scope,
       show: false
@@ -32,10 +51,10 @@
       console.log(newVal);
         if(newVal.length > 5) {
         $scope.loading = true;
+      var link = {
+        url: $scope.look.link                
       }
-      $http.post('/api/links/scrape', {
-        url: $scope.look.link
-      })
+      scrapeAPI.getScrapeDetails(link)
       .then(function(data) {
         console.log(data);
         $scope.showScrapeDetails = true;
@@ -54,7 +73,34 @@
         $scope.loading = false;
         $scope.uploadLookForm = false;
       });
+    }
     });
+      
+     $scope.addScrapePost = function() {
+      var look = {
+        description: $scope.look.description,
+        title: $scope.look.title,
+        image: $scope.look.imgThumb,
+        linkURL: $scope.look.link,
+        email: $scope.user.email,
+        name: $scope.user.name,
+        _creator: $scope.user._id
+      }
+      looksAPI.createScrapeLook(look)
+        .then(function(data) {
+          alertSuccess.show();
+          $scope.showScrapeDetails = false;
+          $scope.gotScrapeResults = false;
+          $scope.look.title = '';
+          $scope.look.link = '';
+          console.log(data);
+        })
+        .catch(function() {
+          console.log('failed to post');
+          alertFail.show();
+          $scope.showScrapeDetails = false;
+        });
+    }
 
   }
 })();

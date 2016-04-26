@@ -9,7 +9,7 @@ scrapers['pinterest'] = require('./scrapers/pinterest.js');
 exports.scrape = function(req, res) {
   var url = req.body.url;//user provide
   var scraperToUse;
-
+  console.log("url: "+url+"index: "+url.indexOf('pinterest'));
   if(url.indexOf('pinterest') > -1) {
     scraperToUse = 'pinterest';
   } else {
