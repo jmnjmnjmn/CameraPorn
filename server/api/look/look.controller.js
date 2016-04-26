@@ -54,6 +54,34 @@ exports.scrapeUpload = function(req, res) {
   });
 }
 
+exports.upload = function(req, res) {
+  var newLook = new Look();
+  var fileimage = req.middlewareStorage.fileimage;
+
+  console.log(req.body);
+  newLook.image = '/assets/images/uploads/' + fileimage;
+  newLook.email = req.body.email;
+  newLook.linkURL = req.body.linkURL;
+  newLook.title = req.body.title;
+  newLook.description = req.body.description;
+  newLook.userName = req.body.name;
+  newLook._creator = req.body._creator;
+  newLook.createTime = Date.now();
+  newLook.upVotes = 0;
+
+  newLook.save(function(err, look) {
+    if (err) {
+      console.log('error saving look ');
+      return res.send(500);
+    } else {
+      console.log(look);
+      console.log('Look Saved to DB ');
+      res.status(200)
+        .send(look);
+    }
+  });
+};
+
 function handleError(res, err) {
   return res.send(500, err);
 }

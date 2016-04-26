@@ -6,20 +6,21 @@
     .controller('MainCtrl', MainCtrl);
   
     //alert is from AngularStrap
-  MainCtrl.$inject = ['$scope', '$state', 'Auth', '$modal','looksAPI', 'scrapeAPI','$http','$alert'];
+  MainCtrl.$inject = ['$scope', '$state', 'Auth', '$modal','looksAPI', 'scrapeAPI','$http','$alert','Upload'];
 
-  function MainCtrl($scope, $state, Auth,  $modal, looksAPI, scrapeAPI,$http,$alert) {
+  function MainCtrl($scope, $state, Auth,  $modal, looksAPI, scrapeAPI,$http,$alert,Upload) {
     $scope.user = Auth.getCurrentUser();
 
     $scope.look = {};
     $scope.looks = [];
     $scope.scrapePostForm = true;
-//    $scope.uploadLookTitle = true;
-//    $scope.uploadLookForm = false;
+
     $scope.showScrapeDetails = false;
     $scope.gotScrapeResults = false;
     $scope.loading = false;
 
+    $scope.uploadLookTitle = true;
+    $scope.uploadLookForm = false;
       
     var alertSuccess = $alert({
         title: 'Success! ',
@@ -56,6 +57,12 @@
         .catch(function(err) {
           console.log('failed to get loks' + err);
         });    
+    
+    $scope.showUploadForm = function() {
+      $scope.uploadLookForm = true;
+      $scope.scrapePostForm = false;
+      $scope.uploadLookTitle = false;
+    }
 
     // Watch for changes to URL, Scrape and Display Results
     $scope.$watch('look.link', function(newVal, oldVal) {
@@ -113,6 +120,37 @@
           alertFail.show();
           $scope.showScrapeDetails = false;
         });
+    }
+     
+     $scope.uploadPic = function(file) {
+      Upload.upload({
+        url: 'api/look/upload',
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        },
+        data: {
+          file: file,
+          title: $scope.look.title,
+          description: $scope.look.description,
+          email: $scope.user.email,
+          name: $scope.user.name,
+          linkURL: $scope.look._id,
+          _creator: $scope.user._id
+        }
+      }).then(function(resp) {
+        console.log('Success ' + resp.config.data.file.name + 'uploaded. Response: ' + resp.data);
+        $scope.looks.splice(0, 0, resp.data);
+        $scope.look.title = '';
+        $scope.look.description = '';
+        $scope.picFile = '';
+        $scope.picPreview = false;
+        alertSuccess.show();
+      }, function(resp) {
+        alertFail.show();
+      }, function(evt) {
+        var progressPercentage = parseInt(100.0 * evt.loaded / evt.total);
+        console.log('progress: ' + progressPercentage + '% ' + evt.config.data.file.name);
+      });
     }
 
   }

@@ -25,6 +25,43 @@
 .add-look-btn {
   margin-left: 20px;
 }
+.uploadLookTitle button {
+  max-width: 300px;
+  margin-left: 20px;
+}
+.well.well-lg {
+  width: 400px;
+  padding: 10px 15px;
+}
+.form-control {
+  display: inline;
+  width: 70%;
+}
+.row-centered {
+    text-align: center;
+}
+.col-centered {
+    display: inline-block;
+    float: none;
+    text-align: left;
+    margin-right: -4px;
+}
+.col-max {
+    max-width:440px;
+}
+.item {
+    width:100%;
+    height:100%;
+}
+.progress {
+  margin-top: 20px;
+}
+#alertContainer {
+  margin-top: 10px;
+}
+#loadButton {
+  margin: 20px 0px 10px 105px;
+}
 #searchFilterWrap {
   margin: 0 auto;
   margin-top: 15px;
