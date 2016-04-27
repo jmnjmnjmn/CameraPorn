@@ -88,6 +88,32 @@ exports.scrapeUpload = function(req, res) {
   });
 }
 
+
+exports.scrapeUpload2 = function(req, res) {
+  
+    var newLook = new Look();
+    newLook.title = req.body.title;
+    newLook.image = req.body.image;
+    newLook.email = req.body.email;
+    newLook.linkURL = req.body.linkURL;
+    newLook.description = req.body.description;
+    newLook.userName = req.body.name;
+    newLook._creator = req.body._creator;
+    newLook.createTime = Date.now();
+    newLook.upVotes = 0;
+    newLook.save(function(err, item) {
+      if (err) {
+        console.log('error occured in saving post');
+      } else {
+        console.log('Success post saved');
+        console.log(item);
+        res.status(200)
+          .json(item);
+      }
+    });
+  };
+
+
 exports.upload = function(req, res) {
   var newLook = new Look();
   var fileimage = req.middlewareStorage.fileimage;
