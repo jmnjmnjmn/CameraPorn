@@ -97,13 +97,23 @@
                       </div>
 
               <div class="controls">
+<!--
                 <input class="bottom-marg-15"
                           type="file"
                           ngf-select
                           ng-model="picFile"
                           accept="image/*"
                           ngf-max-size="2MB" />
-
+-->
+                
+                <input type="file" name = "uploadPic" class ="uploadPic">
+                
+                <button id="doUpload">Upload</button>
+                
+                <div class="progressBarDiv">
+					<div class="progress"></div>
+				</div>
+                  
                 <span class="progress" ng-show="picFile.progress >= 0">
                   <div style="width:{{picFile.progress}}%" ng-bind="picFile.progress + '%'" class="ng-binding"></div>
                </span>
@@ -114,10 +124,12 @@
                         ngf-src="!picFile.$error && picFile"
                         class="img-thumbnail img-responsive">
 
+<!--
                 <button id="loadButton"
                             ng-disabled="!myForm.$valid"
                             class="btn btn-primary btn-lg"
                             ng-click="uploadPic(picFile)">Submit</button>
+-->
 
                 <div class="col-md-6" id="alertContainer"></div>
                 <img ngf-src="picFile"

@@ -41,12 +41,17 @@ var all = {
     }
   },
 
-  keys:{
-    access: process.env.access,
-    secret: process.env.secret,
-    bucket: process.env.bucket,
-    region: process.env.region
-  },
+    
+    "S3AccessKey":process.env.S3AccessKey,
+	"S3Secret":process.env.S3Secret,
+	"S3Bucket":process.env.S3Bucket,
+    
+//  keys:{
+//    access: process.env.access,
+//    secret: process.env.secret,
+//    bucket: process.env.bucket,
+//    region: process.env.region
+//  },
 
   facebook: {
     clientID:     process.env.FACEBOOK_ID || 'id',

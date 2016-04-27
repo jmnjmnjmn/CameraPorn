@@ -5,6 +5,19 @@ var Look = require('./look.model');
 var path = require('path');
 var express = require('express');
 var utils = require('../../utils/utils.js');
+var config = require('../../config/environment');
+var knox = require('knox');
+var fs = require('fs');
+var os = require('os');
+var formidable = require('formidable');
+var gm = require('gm');
+    
+
+var knoxClient = knox.createClient({
+	key: config.S3AccessKey,
+	secret: config.S3Secret,
+	bucket: config.S3Bucket
+})
 
 exports.allLooks = function(req, res) {
   Look.find({})
@@ -45,9 +58,11 @@ exports.userLooks = function(req, res) {
 };
 
 exports.scrapeUpload = function(req, res) {
-  var random = utils.randomizer(32, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+  
+    var random = utils.randomizer(32, '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
 
   utils.downloadURI(req.body.image, '../client/assets/images/uploads/' + random + '.png', function(filename) {
+      
     console.log('done');
 
     var newLook = new Look();
@@ -76,8 +91,8 @@ exports.scrapeUpload = function(req, res) {
 exports.upload = function(req, res) {
   var newLook = new Look();
   var fileimage = req.middlewareStorage.fileimage;
-
-  console.log(req.body);
+//  console.log(fileimage);
+//  console.log(req.body);
   newLook.image = '/assets/images/uploads/' + fileimage;
   newLook.email = req.body.email;
   newLook.linkURL = req.body.linkURL;
@@ -99,6 +114,60 @@ exports.upload = function(req, res) {
     }
   });
 };
+
+
+exports.upload2 = function(req, res){
+	console.log("body");
+    console.log(req.body);
+	var tmpFile, nfile, fname;
+	var newForm = new formidable.IncomingForm();
+    newForm.keepExtensions = true;
+    newForm.parse(req, function(err, fields, files){
+        tmpFile = files.upload.path;
+        fname = files.upload.name;
+        nfile = os.tmpDir() + '/' + fname;
+        res.writeHead(200, {'Content-type':'text/plain'});
+        res.end();
+    })
+
+	
+    newForm.on('end', function(){
+        console.log("tempFile: "+ tmpFile);
+        console.log("nfile: "+ nfile);
+        console.log("fname: "+ fname);
+
+        fs.rename(tmpFile, nfile, function(){
+            // Resize the image and upload this file into the S3 bucket
+            gm(nfile).resize(300).write(nfile, function(){
+                // Upload to the S3 Bucket
+                fs.readFile(nfile, function(err, buf){
+                    var req = knoxClient.put(fname, {
+                        'Content-Length':buf.length,
+                        'Content-Type':'image/jpeg'
+                    })
+
+                    req.on('response', function(res){
+                        if(res.statusCode == 200){
+                            var newLook = new Look();
+                            newLook.image = 'https://d14rdkekk76br1.cloudfront.net/'+fname;
+                            newLook.save();
+                            console.log(newLook);
+                            
+                            // Delete the Local File
+                            fs.unlink(nfile, function(){
+                                console.log('Local File Deleted !');
+                            })
+
+                        }
+                    })
+
+                    req.end(buf);
+                })
+            })
+        })
+    })
+};
+
 
 exports.singleLook = function(req, res) {
   Look.findById(req.params.lookId, function(err, look) {

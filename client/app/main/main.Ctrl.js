@@ -28,7 +28,7 @@
 
     var alertSuccess = $alert({
       title: 'Success! ',
-      content: 'New Look added',
+      content: 'New Look added, please refresh page',
       placement: 'top-right',
       container: '#alertContainer',
       type: 'success',
@@ -56,6 +56,8 @@
     looksAPI.getAllLooks()
       .then(function(data) {
         console.log('looks found ');
+        console.log(data);
+        
         $scope.allData = data.data;
         $scope.nextPage();
         $scope.busy = false;
@@ -141,6 +143,7 @@
           alertSuccess.show();
           $scope.showScrapeDetails = false;
           $scope.gotScrapeResults = false;
+          $scope.uploadLookTitle = true;
           $scope.look.title = '';
           $scope.look.link = '';
           $scope.looks.splice(0, 0, data.data);
@@ -182,6 +185,52 @@
         console.log('progress: ' + progressPercentage + '% ' + evt.config.data.file.name);
       });
     }
+    
+    
+    $(document).on('click', '#doUpload', function(){
+			uploadNow();
+         alertSuccess.show();
+	})
+    
+    
+    
+    function uploadNow(){
+			$('.progress').fadeIn(100);
+			var uploadFile = $('.uploadPic');
+			
+			if(uploadFile.val()!=''){
+				var form = new FormData();
+				form.append("upload", uploadFile[0].files[0]);
+				console.log(uploadFile[0].files[0]);
+				// Perform the AJAX POST request and send the file
+				ajax({
+					method:'post',
+					url: '/api/look/upload',
+					success:function(){
+						$('.progress').fadeOut(200);
+						uploadFile.val('');
+					},
+					progress: function(e){
+						if(e.lengthComputable){
+							var perc = Math.round((e.loaded * 100) / e.total);
+							$('.progress').css('width', (perc + '%'));
+						}
+					},
+					payload:form
+				})
+			}
+		}
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 
   }
 })();

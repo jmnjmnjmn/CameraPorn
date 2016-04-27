@@ -102,6 +102,9 @@
 #alertContainer {
   margin-top: 10px;
 }
+#doUpload {
+  margin: 20px 0px 10px 105px;
+}
 #loadButton {
   margin: 20px 0px 10px 105px;
 }
