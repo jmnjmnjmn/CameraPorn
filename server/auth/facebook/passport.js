@@ -2,11 +2,6 @@ var passport = require('passport');
 var FacebookStrategy = require('passport-facebook').Strategy;
 
 exports.setup = function (User, config) {
-//  console.log("clientID: "+config.facebook.clientID);
-//  console.log("clientSecret: "+config.facebook.clientSecret);
-  console.log("callback:  "+config.facebook.callbackURL);
-  console.log("profileFields:  "+config.facebook.profileFields);
-
   passport.use(new FacebookStrategy(config.facebook,
     function(accessToken, refreshToken, profile, done) {
       User.findOne({
