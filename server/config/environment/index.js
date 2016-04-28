@@ -54,17 +54,17 @@ var all = {
 //  },
 
   facebook: {
-    clientID:     process.env.FACEBOOK_ID || 'id',
-    clientSecret: process.env.FACEBOOK_SECRET || 'secret',
-    callbackURL:  (process.env.DOMAIN || '') + '/auth/facebook/callback',
-    profileFields: process.env.FBprofileFields
+    "clientID":     process.env.FACEBOOK_ID || 'id',
+    "clientSecret": process.env.FACEBOOK_SECRET || 'secret',
+    "callbackURL":  (process.env.DOMAIN || '') + '/auth/facebook/callback',
+    "profileFields": ["id", "displayName", "emails"]
   },
 
   twitter: {
     consumerKey:     process.env.TWITTER_ID || 'id',
     consumerSecret: process.env.TWITTER_SECRET || 'secret',
     callbackURL:  (process.env.DOMAIN || '') + '/auth/twitter/callback',
-    profileFields: process.env.TWprofileFields  
+    "profileFields": ["id", "displayName", "username"]
   },
 
 };
